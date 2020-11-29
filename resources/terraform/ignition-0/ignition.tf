@@ -1,5 +1,5 @@
 variable "name_prefix" {
-  type = string
+  type = list(string)
 }
 
 locals {
@@ -13,6 +13,10 @@ terraform {
 provider "azurerm" {
   version = "=2.38.0"
   features {}
+}
+
+provider "random" {
+  version = "=3.0.0"
 }
 
 module "us_central" {

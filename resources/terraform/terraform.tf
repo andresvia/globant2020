@@ -3,8 +3,8 @@ terraform {
 
   backend "azurerm" {
     resource_group_name  = "g20-ignition-centralus"
-    storage_account_name = "g20ignitioncentralus"
-    container_name       = "terraform"
+    // storage_account_name will be set with partial config
+    container_name       = "g20-terraform-state"
     key                  = "terraform.tfstate"
   }
 }
