@@ -18,6 +18,10 @@ variable public_kube_access_from_cidrs {
   type = list(string)
 }
 
+variable azure_container_registry_name {
+  type = string
+}
+
 module centralus {
   source      = "../orchestration-config"
   name_prefix = ["g20"]
@@ -27,8 +31,9 @@ module centralus {
     compute_subnet                = "g20-project-x-compute"
     orchestration_subnet          = "g20-project-x-orchestration"
     virtual_network               = "g20-project-x"
-    log_workspace                 = "g20-project-x"
+    log_workspace                 = "g20-project-x-xyz"
     public_kube_access_from_cidrs = var.public_kube_access_from_cidrs
+    registry                      = var.azure_container_registry_name
   }
 }
 

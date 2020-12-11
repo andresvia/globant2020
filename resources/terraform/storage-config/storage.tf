@@ -91,10 +91,21 @@ output log_analytics_workspace {
   }
 }
 
+data azurerm_subscription current {}
+
 output registry {
   value = {
-    name   = azurerm_container_registry.registry.name
-    id     = azurerm_container_registry.registry.id
-    server = azurerm_container_registry.registry.login_server
+    name     = azurerm_container_registry.registry.name
+    id       = azurerm_container_registry.registry.id
+    server   = azurerm_container_registry.registry.login_server
+    cli_test = <<SHELL
+az account set --subscription ${data.azurerm_subscription.current.subscription_id}
+az acr login --name ${azurerm_container_registry.registry.name}
+docker pull hello-world
+docker tag hello-world ${azurerm_container_registry.registry.login_server}/hello-world
+docker push ${azurerm_container_registry.registry.login_server}/hello-world
+docker pull ${azurerm_container_registry.registry.login_server}/hello-world
+docker run ${azurerm_container_registry.registry.login_server}/hello-world
+SHELL
   }
 }

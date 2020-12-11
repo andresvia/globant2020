@@ -1,4 +1,4 @@
-variable "config" {
+variable config {
   type = object({
     name_prefix = list(string)
     geo         = string
@@ -15,17 +15,17 @@ locals {
   })
 }
 
-resource "azurerm_resource_group" "ignition" {
+resource azurerm_resource_group ignition {
   name     = join("-", concat(var.config.name_prefix, ["ignition", var.config.geo]))
   location = var.config.geo
   tags     = local.tags
 }
 
-resource "random_id" "storage_account" {
+resource random_id storage_account {
   byte_length = 6
 }
 
-resource "azurerm_storage_account" "ignition" {
+resource azurerm_storage_account ignition {
   name = substr(join("", concat(var.config.name_prefix, [
     "ignition",
     random_id.storage_account.hex,
@@ -39,24 +39,24 @@ resource "azurerm_storage_account" "ignition" {
   })
 }
 
-resource "azurerm_storage_container" "terraform_state" {
+resource azurerm_storage_container terraform_state {
   name                  = join("-", concat(var.config.name_prefix, ["terraform-state"]))
   storage_account_name  = azurerm_storage_account.ignition.name
   container_access_type = "private"
 }
 
-output "resource_group" {
+output resource_group {
   value = azurerm_resource_group.ignition.id
 }
 
-output "name_generator" {
+output name_generator {
   value = random_id.storage_account.b64_url
 }
 
-output "storage_account" {
+output storage_account {
   value = azurerm_storage_account.ignition.id
 }
 
-output "storage_container" {
+output storage_container {
   value = azurerm_storage_container.terraform_state.id
 }

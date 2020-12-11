@@ -1,8 +1,8 @@
-variable "name_prefix" {
+variable name_prefix {
   type = list(string)
 }
 
-variable "location" {
+variable location {
   type = string
 }
 
@@ -16,7 +16,7 @@ locals {
   nodes_name       = join(local.sep, local.nodes_name_parts)
 }
 
-resource "azurerm_resource_group" "meta" {
+resource azurerm_resource_group meta {
   name     = local.name
   location = var.location
   tags = {
@@ -24,7 +24,7 @@ resource "azurerm_resource_group" "meta" {
   }
 }
 
-output "meta" {
+output meta {
   value = {
     name       = azurerm_resource_group.meta.name
     nodes_name = local.nodes_name

@@ -11,6 +11,7 @@ variable config {
     virtual_network               = string
     log_workspace                 = string
     public_kube_access_from_cidrs = list(string)
+    registry                      = string
   })
 }
 
@@ -115,6 +116,37 @@ resource azurerm_kubernetes_cluster public {
   }
 }
 
+data azurerm_virtual_network network {
+  name                = var.config.virtual_network
+  resource_group_name = var.config.group
+}
+
+data azurerm_user_assigned_identity aciconnectorlinux {
+  name                = join("-", ["aciconnectorlinux", azurerm_kubernetes_cluster.public.name])
+  resource_group_name = var.config.nodes_group
+  depends_on = [
+    azurerm_kubernetes_cluster.public
+  ]
+}
+
+resource "azurerm_role_assignment" "aciconnectorlinux_access_to_network" {
+  scope                = data.azurerm_virtual_network.network.id
+  role_definition_name = "Network Contributor"
+  principal_id         = data.azurerm_user_assigned_identity.aciconnectorlinux.principal_id
+}
+
+data azurerm_container_registry registry {
+  name                = var.config.registry
+  resource_group_name = var.config.group
+}
+
+resource azurerm_role_assignment kube_access_to_registry {
+  for_each             = toset([for identity in azurerm_kubernetes_cluster.public.kubelet_identity : identity.object_id])
+  scope                = data.azurerm_container_registry.registry.id
+  role_definition_name = "AcrPull"
+  principal_id         = each.value
+}
+
 data azurerm_subscription current {}
 
 output public_cluster {
@@ -122,7 +154,14 @@ output public_cluster {
     cli_connect = <<SHELL
 az account set --subscription ${data.azurerm_subscription.current.subscription_id}
 az aks get-credentials --resource-group ${data.azurerm_resource_group.group.name} --name ${azurerm_kubernetes_cluster.public.name}
+kubectl get deployments --all-namespaces=true
 SHELL
     id          = azurerm_kubernetes_cluster.public.id
+    identities = {
+      kubelet = azurerm_kubernetes_cluster.public.kubelet_identity
+      oms_agent = flatten([for profile in azurerm_kubernetes_cluster.public.addon_profile :
+        [for agent in profile["oms_agent"] : agent["oms_agent_identity"]]
+      ])
+    }
   }
 }
