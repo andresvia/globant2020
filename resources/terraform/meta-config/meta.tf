@@ -7,10 +7,13 @@ variable "location" {
 }
 
 locals {
-  sep        = "-"
-  title      = ["project", "x"]
-  name_parts = concat(var.name_prefix, local.title, [var.location])
-  name       = join(local.sep, local.name_parts)
+  sep              = "-"
+  title            = ["project", "x"]
+  base_name_parts  = concat(var.name_prefix, local.title)
+  name_parts       = concat(local.base_name_parts, [var.location])
+  nodes_name_parts = concat(local.base_name_parts, ["nodes", var.location])
+  name             = join(local.sep, local.name_parts)
+  nodes_name       = join(local.sep, local.nodes_name_parts)
 }
 
 resource "azurerm_resource_group" "meta" {
@@ -23,7 +26,9 @@ resource "azurerm_resource_group" "meta" {
 
 output "meta" {
   value = {
-    name = azurerm_resource_group.meta.name
-    id   = azurerm_resource_group.meta.id
+    name       = azurerm_resource_group.meta.name
+    nodes_name = local.nodes_name
+    id         = azurerm_resource_group.meta.id
+    nodes_id   = "pending"
   }
 }

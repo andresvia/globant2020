@@ -5,6 +5,7 @@ variable name_prefix {
 variable config {
   type = object({
     group                         = string
+    nodes_group                   = string
     compute_subnet                = string
     orchestration_subnet          = string
     virtual_network               = string
@@ -48,10 +49,10 @@ resource azurerm_kubernetes_cluster public {
   dns_prefix                      = local.public_dns_name
   kubernetes_version              = "1.18.10"
   name                            = local.public_name
-  node_resource_group             = var.config.group
+  node_resource_group             = var.config.nodes_group
   private_cluster_enabled         = false
-  resource_group_name             = var.config.group
-  location                        = "centralus"
+  resource_group_name             = data.azurerm_resource_group.group.name
+  location                        = data.azurerm_resource_group.group.location
 
   addon_profile {
     aci_connector_linux {

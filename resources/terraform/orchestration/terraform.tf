@@ -23,6 +23,7 @@ module centralus {
   name_prefix = ["g20"]
   config = {
     group                         = "g20-project-x-centralus"
+    nodes_group                   = "g20-project-x-nodes-centralus"
     compute_subnet                = "g20-project-x-compute"
     orchestration_subnet          = "g20-project-x-orchestration"
     virtual_network               = "g20-project-x"
