@@ -1,4 +1,4 @@
-variable "name_prefix" {
+variable ignition_name_prefix {
   type = list(string)
 }
 
@@ -10,24 +10,24 @@ terraform {
   required_version = "=0.13.5"
 }
 
-provider "azurerm" {
+provider azurerm {
   version = "=2.38.0"
   features {}
 }
 
-provider "random" {
+provider random {
   version = "=3.0.0"
 }
 
-module "us_central" {
+module us_central {
   source = "../ignition-geo"
   config = {
-    name_prefix = var.name_prefix
+    name_prefix = var.ignition_name_prefix
     geo         = local.us_central
   }
 }
 
-output "ignition" {
+output ignition {
   value = {
     (local.us_central) = module.us_central
   }

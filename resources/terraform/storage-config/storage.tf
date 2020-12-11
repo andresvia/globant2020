@@ -1,8 +1,8 @@
-variable "name_prefix" {
+variable name_prefix {
   type = list(string)
 }
 
-variable "config" {
+variable config {
   type = object({
     group           = string
     compute_subnet  = string
@@ -10,11 +10,11 @@ variable "config" {
   })
 }
 
-variable "randomize_suffix" {
+variable randomize_suffix {
   type = bool
 }
 
-variable "registry_access_from_cidrs" {
+variable registry_access_from_cidrs {
   type = list(string)
 }
 
@@ -29,18 +29,18 @@ locals {
   registry       = join("", local.registry_parts)
 }
 
-data "azurerm_resource_group" "group" {
+data azurerm_resource_group group {
   name = var.config.group
 }
 
-resource "random_id" "suffix" {
+resource random_id suffix {
   byte_length = 6
   keepers = {
     randomize_suffix = var.randomize_suffix
   }
 }
 
-resource "azurerm_log_analytics_workspace" "workspace" {
+resource azurerm_log_analytics_workspace workspace {
   name                = local.name
   location            = data.azurerm_resource_group.group.location
   resource_group_name = data.azurerm_resource_group.group.name
@@ -51,17 +51,17 @@ resource "azurerm_log_analytics_workspace" "workspace" {
   }
 }
 
-resource "random_id" "registry" {
+resource random_id registry {
   byte_length = 6
 }
 
-data "azurerm_subnet" "compute" {
+data azurerm_subnet compute {
   name                 = var.config.compute_subnet
   virtual_network_name = var.config.virtual_network
   resource_group_name  = var.config.group
 }
 
-resource "azurerm_container_registry" "registry" {
+resource azurerm_container_registry registry {
   name                = local.registry
   resource_group_name = data.azurerm_resource_group.group.name
   location            = data.azurerm_resource_group.group.location
@@ -84,14 +84,14 @@ resource "azurerm_container_registry" "registry" {
   }
 }
 
-output "log_analytics_workspace" {
+output log_analytics_workspace {
   value = {
     name = azurerm_log_analytics_workspace.workspace.name
     id   = azurerm_log_analytics_workspace.workspace.workspace_id
   }
 }
 
-output "registry" {
+output registry {
   value = {
     name   = azurerm_container_registry.registry.name
     id     = azurerm_container_registry.registry.id
