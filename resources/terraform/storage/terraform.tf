@@ -29,9 +29,7 @@ module centralus {
   randomize_suffix           = true
   registry_access_from_cidrs = var.registry_access_from_cidrs
   config = {
-    group           = "g20-project-x-centralus"
-    compute_subnet  = "g20-project-x-compute"
-    virtual_network = "g20-project-x"
+    group = "g20-project-x-centralus"
   }
 }
 

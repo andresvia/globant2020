@@ -4,18 +4,12 @@ variable name_prefix {
 
 variable config {
   type = object({
-    group           = string
-    compute_subnet  = string
-    virtual_network = string
+    group = string
   })
 }
 
 variable randomize_suffix {
   type = bool
-}
-
-variable registry_access_from_cidrs {
-  type = list(string)
 }
 
 locals {
@@ -44,7 +38,7 @@ resource azurerm_log_analytics_workspace workspace {
   name                = local.name
   location            = data.azurerm_resource_group.group.location
   resource_group_name = data.azurerm_resource_group.group.name
-  sku                 = "Standard"
+  sku                 = "Standard" // should be Premium
   retention_in_days   = 30
   tags = {
     title = join(local.sep, local.title)
@@ -55,29 +49,13 @@ resource random_id registry {
   byte_length = 6
 }
 
-data azurerm_subnet compute {
-  name                 = var.config.compute_subnet
-  virtual_network_name = var.config.virtual_network
-  resource_group_name  = var.config.group
-}
-
 resource azurerm_container_registry registry {
   name                = local.registry
   resource_group_name = data.azurerm_resource_group.group.name
   location            = data.azurerm_resource_group.group.location
-  sku                 = "Premium"
-  admin_enabled       = false
-  network_rule_set {
-    default_action = "Deny"
-    virtual_network {
-      action    = "Allow"
-      subnet_id = data.azurerm_subnet.compute.id
-    }
-    ip_rule = [for cidr in var.registry_access_from_cidrs : {
-      action   = "Allow"
-      ip_range = cidr
-    }]
-  }
+  sku                 = "Standard" // should be Premium
+  admin_enabled       = true       // should be false
+  // network_rule_set { default_action = "Allow" } // should be Deny
 
   tags = {
     title = join(local.sep, local.title)

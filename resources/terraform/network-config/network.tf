@@ -41,9 +41,6 @@ resource azurerm_subnet compute {
   address_prefixes = [
     "10.0.18.0/23",
   ]
-  service_endpoints = [
-    "Microsoft.ContainerRegistry"
-  ]
 }
 
 resource azurerm_subnet orchestration {

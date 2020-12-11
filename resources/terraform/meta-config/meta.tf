@@ -24,6 +24,11 @@ resource azurerm_resource_group meta {
   }
 }
 
+resource azurerm_private_dns_zone meta {
+  name                = join(".", [join("", local.title), "local"])
+  resource_group_name = azurerm_resource_group.meta.name
+}
+
 output meta {
   value = {
     name       = azurerm_resource_group.meta.name

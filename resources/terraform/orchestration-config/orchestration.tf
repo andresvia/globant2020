@@ -4,14 +4,13 @@ variable name_prefix {
 
 variable config {
   type = object({
-    group                         = string
-    nodes_group                   = string
-    compute_subnet                = string
-    orchestration_subnet          = string
-    virtual_network               = string
-    log_workspace                 = string
-    public_kube_access_from_cidrs = list(string)
-    registry                      = string
+    group                = string
+    nodes_group          = string
+    compute_subnet       = string
+    orchestration_subnet = string
+    virtual_network      = string
+    log_workspace        = string
+    registry             = string
   })
 }
 
@@ -46,14 +45,13 @@ locals {
 }
 
 resource azurerm_kubernetes_cluster public {
-  api_server_authorized_ip_ranges = var.config.public_kube_access_from_cidrs
-  dns_prefix                      = local.public_dns_name
-  kubernetes_version              = "1.18.10"
-  name                            = local.public_name
-  node_resource_group             = var.config.nodes_group
-  private_cluster_enabled         = false
-  resource_group_name             = data.azurerm_resource_group.group.name
-  location                        = data.azurerm_resource_group.group.location
+  dns_prefix              = local.public_dns_name
+  kubernetes_version      = "1.18.10"
+  name                    = local.public_name
+  node_resource_group     = var.config.nodes_group
+  private_cluster_enabled = false
+  resource_group_name     = data.azurerm_resource_group.group.name
+  location                = data.azurerm_resource_group.group.location
 
   addon_profile {
     aci_connector_linux {
@@ -129,7 +127,7 @@ data azurerm_user_assigned_identity aciconnectorlinux {
   ]
 }
 
-resource "azurerm_role_assignment" "aciconnectorlinux_access_to_network" {
+resource azurerm_role_assignment aciconnectorlinux_access_to_network {
   scope                = data.azurerm_virtual_network.network.id
   role_definition_name = "Network Contributor"
   principal_id         = data.azurerm_user_assigned_identity.aciconnectorlinux.principal_id
