@@ -10,7 +10,6 @@ variable config {
     orchestration_subnet = string
     virtual_network      = string
     log_workspace        = string
-    registry             = string
   })
 }
 
@@ -131,18 +130,6 @@ resource azurerm_role_assignment aciconnectorlinux_access_to_network {
   scope                = data.azurerm_virtual_network.network.id
   role_definition_name = "Network Contributor"
   principal_id         = data.azurerm_user_assigned_identity.aciconnectorlinux.principal_id
-}
-
-data azurerm_container_registry registry {
-  name                = var.config.registry
-  resource_group_name = var.config.group
-}
-
-resource azurerm_role_assignment kube_access_to_registry {
-  for_each             = toset([for identity in azurerm_kubernetes_cluster.public.kubelet_identity : identity.object_id])
-  scope                = data.azurerm_container_registry.registry.id
-  role_definition_name = "AcrPull"
-  principal_id         = each.value
 }
 
 data azurerm_subscription current {}

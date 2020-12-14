@@ -1,11 +1,11 @@
 terraform {
   required_version = "=0.13.5"
 
-  backend "azurerm" {
+  backend azurerm {
     resource_group_name  = "g20-ignition-centralus"
     storage_account_name = "g20ignition79a4bb602306"
     container_name       = "g20-terraform-state"
-    key                  = "infra/network.tfstate"
+    key                  = "infra/orchestration-permissions.tfstate"
   }
 }
 
@@ -15,12 +15,15 @@ provider azurerm {
 }
 
 module centralus {
-  source      = "../network-config"
-  group       = "g20-project-x-centralus"
-  name_prefix = ["g20"]
+  source = "../orchestration-permissions-config"
+  config = {
+    group    = "g20-project-x-centralus"
+    name     = "g20-project-x-public"
+    registry = "g20projectxea6040498c9e"
+  }
 }
 
-output network {
+output orchestration {
   value = {
     centralus = module.centralus
   }

@@ -2,10 +2,10 @@ terraform {
   required_version = "=0.13.5"
 
   backend azurerm {
-    resource_group_name = "g20-ignition-centralus"
-    // storage_account_name will be set with partial config
-    container_name = "g20-terraform-state"
-    key            = "infra/orchestration.tfstate"
+    resource_group_name  = "g20-ignition-centralus"
+    storage_account_name = "g20ignition79a4bb602306"
+    container_name       = "g20-terraform-state"
+    key                  = "infra/orchestration.tfstate"
   }
 }
 
@@ -24,7 +24,6 @@ module centralus {
     orchestration_subnet = "g20-project-x-orchestration"
     virtual_network      = "g20-project-x"
     log_workspace        = "g20-project-x-1928a747f450"
-    registry             = "g20projectxea6040498c9e"
   }
 }
 
